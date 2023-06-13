@@ -5,10 +5,11 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, { useCallback } from 'react';
+import React, {useCallback} from 'react';
 import Color from '../modules/Color';
-import { Colors } from 'react-native/Libraries/NewAppScreen';
-import { useNavigation } from '@react-navigation/native';
+import {Colors} from 'react-native/Libraries/NewAppScreen';
+import {useNavigation} from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const styles = StyleSheet.create({
   container: {
@@ -21,7 +22,6 @@ const styles = StyleSheet.create({
   left: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
   },
   center: {
     flex: 3,
@@ -43,6 +43,11 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: Colors.BLACK,
   },
+  backButtonIcon: {
+    color: Colors.BLACK,
+    fontSize: 20,
+    marginLeft: 20,
+  },
 });
 
 interface ScreenProps {
@@ -50,8 +55,8 @@ interface ScreenProps {
   children?: React.ReactNode;
 }
 
-const Screen = ({ children, title }: ScreenProps) => {
-  const { goBack, canGoBack } = useNavigation();
+const Screen = ({children, title}: ScreenProps) => {
+  const {goBack, canGoBack} = useNavigation();
   const onPressBackButton = useCallback(() => {
     goBack();
   }, [goBack]);
@@ -61,7 +66,7 @@ const Screen = ({ children, title }: ScreenProps) => {
         <View style={styles.left}>
           {canGoBack() && (
             <TouchableOpacity onPress={onPressBackButton}>
-              <Text style={styles.backButtonText}>{'Back'}</Text>
+              <Icon style={styles.backButtonIcon} name="arrow-back" />
             </TouchableOpacity>
           )}
         </View>

@@ -80,6 +80,10 @@ const styles = StyleSheet.create({
   sendText: {
     color: Colors.WHITE,
   },
+  sendIcon: {
+    color: Colors.WHITE,
+    fontSize: 18,
+  },
 });
 
 const disabledSendButtonStyle = [
@@ -138,6 +142,7 @@ const ChatScreen = () => {
             disabled={sendDisabled}
             onPress={onPressSendButton}>
             <Text style={styles.sendText}>Send</Text>
+            <Icon style={styles.sendIcon} name="send" />
           </TouchableOpacity>
         </View>
       </View>
