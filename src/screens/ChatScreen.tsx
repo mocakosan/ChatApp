@@ -15,6 +15,7 @@ import {useCallback, useContext, useMemo, useState} from 'react';
 import Colors from '../modules/Color';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import AuthContext from '../components/AuthContext';
+import Message from '../components/Message';
 
 const styles = StyleSheet.create({
   container: {
@@ -51,6 +52,7 @@ const styles = StyleSheet.create({
   },
   messageList: {
     flex: 1,
+    marginVertical: 20,
   },
   inputContainer: {
     flexDirection: 'row',
@@ -84,6 +86,9 @@ const styles = StyleSheet.create({
   sendIcon: {
     color: Colors.WHITE,
     fontSize: 18,
+  },
+  messageSeparatot: {
+    height: 8,
   },
 });
 
@@ -137,17 +142,22 @@ const ChatScreen = () => {
         </View>
 
         <FlatList
+          inverted
           style={styles.messageList}
           data={messages}
           renderItem={({item: message}) => {
             return (
-              <View>
-                <Text>{message.user.name}</Text>
-                <Text>{message.text}</Text>
-                <Text>{message.createdAt.toISOString()}</Text>
-              </View>
+              <Message
+                name={message.user.name}
+                text={message.text}
+                createdAt={message.createdAt}
+                isOtherMessage={message.user.userId !== me?.userId}
+              />
             );
           }}
+          ItemSeparatorComponent={() => (
+            <View style={styles.messageSeparator} />
+          )}
         />
         <View style={styles.inputContainer}>
           <View style={styles.textInputContainer}>
@@ -168,7 +178,15 @@ const ChatScreen = () => {
         </View>
       </View>
     );
-  }, [chat, onChangeText, text, sendDisabled, onPressSendButton, messages]);
+  }, [
+    chat,
+    onChangeText,
+    text,
+    sendDisabled,
+    onPressSendButton,
+    messages,
+    me?.userId,
+  ]);
   return (
     <Screen title={other.name}>
       <View style={styles.container}>
