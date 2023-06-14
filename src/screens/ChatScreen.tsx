@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
     color: Colors.WHITE,
     fontSize: 18,
   },
-  messageSeparatot: {
+  messageSeparator: {
     height: 8,
   },
 });

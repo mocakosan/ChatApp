@@ -94,8 +94,8 @@ const useChat = (userIds: string[]) => {
           {
             id: doc.id,
             text: text,
-            imageUrl: null,
-            audioUrl: null,
+            // imageUrl: null,
+            // audioUrl: null,
             user: user,
             createdAt: new Date(),
           },
@@ -130,8 +130,8 @@ const useChat = (userIds: string[]) => {
             const newMessage: Message = {
               id: doc.id,
               text: docData.text ?? null,
-              imageUrl: docData.imageUrl ?? null,
-              audioUrl: docData.audioUrl ?? null,
+              // imageUrl: docData.imageUrl ?? null,
+              // audioUrl: docData.audioUrl ?? null,
               user: docData.user,
               createdAt: docData.createdAt.toDate(),
             };
@@ -229,8 +229,8 @@ const useChat = (userIds: string[]) => {
           {
             id: doc.id,
             text: null,
-            imageUrl: url,
-            audioUrl: null,
+            // imageUrl: url,
+            // audioUrl: null,
             user: user,
             createdAt: new Date(),
           },
@@ -276,8 +276,8 @@ const useChat = (userIds: string[]) => {
           {
             id: doc.id,
             text: null,
-            imageUrl: null,
-            audioUrl: url,
+            // imageUrl: null,
+            // audioUrl: url,
             user: user,
             createdAt: new Date(),
           },
@@ -288,34 +288,45 @@ const useChat = (userIds: string[]) => {
     },
     [addNewMessages, chat],
   );
-  const loadMessages = useCallback(async (chatId: string) => {
-    try {
-      setLoadingMessages(true);
-      const messagesSnapshot = await firestore()
-        .collection(Collections.CHATS)
-        .doc(chatId)
-        .collection(Collections.MESSAGES)
-        .orderBy('createdAt', 'desc')
-        .get();
-      const ms = messagesSnapshot.docs.map<Message>(doc => {
-        const data = doc.data();
-        return {
-          id: doc.id,
-          user: data.user,
-          text: data.text,
-          createdAt: data.createdAt.toDate(),
-        };
-      });
-      setMessages(ms);
-    } finally {
-      setLoadingMessages(false);
-    }
-  }, []);
+
   useEffect(() => {
-    if (chat?.id != null) {
-      loadMessages(chat.id);
+    if (chat?.id == null) {
+      return;
     }
-  }, [chat?.id, loadMessages]);
+    setLoadingMessages(true);
+    const unsubscribe = firestore()
+      .collection(Collections.CHATS)
+      .doc(chat.id)
+      .collection(Collections.MESSAGES)
+      .orderBy('createdAt', 'desc')
+      .onSnapshot(snapshot => {
+        if (snapshot.metadata.hasPendingWrites) {
+          return;
+        }
+        const newMessages = snapshot
+          .docChanges()
+          .filter(({type}) => type === 'added')
+          .map(docChange => {
+            const {doc} = docChange;
+            const docData = doc.data();
+            const newMessage: Message = {
+              id: doc.id,
+              text: docData.text ?? null,
+              // imageUrl: docData.imageUrl ?? null,
+              // audioUrl: docData.audioUrl ?? null,
+              user: docData.user,
+              createdAt: docData.createdAt.toDate(),
+            };
+            return newMessage;
+          });
+        addNewMessages(newMessages);
+        setLoadingMessages(false);
+      });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [addNewMessages, chat?.id]);
 
   return {
     chat,
@@ -324,10 +335,10 @@ const useChat = (userIds: string[]) => {
     messages,
     sending,
     loadingMessages,
-    updateMessageReadAt,
-    userToMessageReadAt,
-    sendImageMessage,
-    sendAudioMessage,
+    // updateMessageReadAt,
+    // userToMessageReadAt,
+    // sendImageMessage,
+    // sendAudioMessage,
   };
 };
 
