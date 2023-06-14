@@ -1,4 +1,4 @@
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 
 export type RootStackParamList = {
   Signup: undefined;
@@ -35,7 +35,7 @@ export interface Message {
   id: string;
   user: User;
   text: string | null;
-  imageUrl: string | null;
-  audioUrl: string | null;
+  // imageUrl: string | null;
+  // audioUrl: string | null;
   createdAt: Date;
 }

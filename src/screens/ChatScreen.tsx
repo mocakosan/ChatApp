@@ -96,9 +96,11 @@ const ChatScreen = () => {
   const {params} = useRoute<RouteProp<RootStackParamList, 'Chat'>>();
   const {other, userIds} = params;
   console.log(params);
-  const {loadingChat, chat, sendMessage} = useChat(userIds);
+  const {loadingChat, chat, sendMessage, messages, loadingMessages} =
+    useChat(userIds);
   const [text, setText] = useState('');
   const {user: me} = useContext(AuthContext);
+  const loading = loadingChat || loadingMessages;
 
   //입력이 안하면 버튼 비활성화
   const sendDisabled = useMemo(() => text.length === 0, [text]);
@@ -133,7 +135,20 @@ const ChatScreen = () => {
             horizontal
           />
         </View>
-        <View style={styles.messageList} />
+
+        <FlatList
+          style={styles.messageList}
+          data={messages}
+          renderItem={({item: message}) => {
+            return (
+              <View>
+                <Text>{message.user.name}</Text>
+                <Text>{message.text}</Text>
+                <Text>{message.createdAt.toISOString()}</Text>
+              </View>
+            );
+          }}
+        />
         <View style={styles.inputContainer}>
           <View style={styles.textInputContainer}>
             <TextInput
@@ -153,11 +168,11 @@ const ChatScreen = () => {
         </View>
       </View>
     );
-  }, [chat, onChangeText, text, sendDisabled, onPressSendButton]);
+  }, [chat, onChangeText, text, sendDisabled, onPressSendButton, messages]);
   return (
     <Screen title={other.name}>
       <View style={styles.container}>
-        {loadingChat ? (
+        {loading ? (
           <View style={styles.loadingContainer}>
             <ActivityIndicator />
           </View>

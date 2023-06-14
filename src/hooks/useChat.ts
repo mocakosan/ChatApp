@@ -1,11 +1,10 @@
-import { useCallback, useEffect, useState } from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import firestore, {
   FirebaseFirestoreTypes,
 } from '@react-native-firebase/firestore';
 import storage from '@react-native-firebase/storage';
 import _ from 'lodash';
-
-import { Chat, Collections, Message, User } from '../types';
+import {Chat, Collections, Message, User} from '../types';
 
 const getChatKey = (userIds: string[]) => {
   return _.orderBy(userIds, userId => userId, 'asc');
@@ -124,9 +123,9 @@ const useChat = (userIds: string[]) => {
         }
         const newMessages = snapshot
           .docChanges()
-          .filter(({ type }) => type === 'added')
+          .filter(({type}) => type === 'added')
           .map(docChange => {
-            const { doc } = docChange;
+            const {doc} = docChange;
             const docData = doc.data();
             const newMessage: Message = {
               id: doc.id,
@@ -289,6 +288,34 @@ const useChat = (userIds: string[]) => {
     },
     [addNewMessages, chat],
   );
+  const loadMessages = useCallback(async (chatId: string) => {
+    try {
+      setLoadingMessages(true);
+      const messagesSnapshot = await firestore()
+        .collection(Collections.CHATS)
+        .doc(chatId)
+        .collection(Collections.MESSAGES)
+        .orderBy('createdAt', 'asc')
+        .get();
+      const ms = messagesSnapshot.docs.map<Message>(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          user: data.user,
+          text: data.text,
+          createdAt: data.createdAt.toDate(),
+        };
+      });
+      setMessages(ms);
+    } finally {
+      setLoadingMessages(false);
+    }
+  }, []);
+  useEffect(() => {
+    if (chat?.id != null) {
+      loadMessages(chat.id);
+    }
+  }, [chat?.id, loadMessages]);
 
   return {
     chat,
