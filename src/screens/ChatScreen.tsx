@@ -11,9 +11,10 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import {useCallback, useMemo, useState} from 'react';
+import {useCallback, useContext, useMemo, useState} from 'react';
 import Colors from '../modules/Color';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import AuthContext from '../components/AuthContext';
 
 const styles = StyleSheet.create({
   container: {
@@ -95,16 +96,20 @@ const ChatScreen = () => {
   const {params} = useRoute<RouteProp<RootStackParamList, 'Chat'>>();
   const {other, userIds} = params;
   console.log(params);
-  const {loadingChat, chat} = useChat(userIds);
+  const {loadingChat, chat, sendMessage} = useChat(userIds);
   const [text, setText] = useState('');
+  const {user: me} = useContext(AuthContext);
 
   //입력이 안하면 버튼 비활성화
   const sendDisabled = useMemo(() => text.length === 0, [text]);
 
   //메세지를 보내면 입력창 초기화
   const onPressSendButton = useCallback(() => {
-    setText('');
-  }, []);
+    if (me != null) {
+      sendMessage(text, me);
+      setText('');
+    }
+  }, [me, sendMessage, text]);
 
   const onChangeText = useCallback((newText: string) => {
     setText(newText);
@@ -133,6 +138,7 @@ const ChatScreen = () => {
           <View style={styles.textInputContainer}>
             <TextInput
               style={styles.textInput}
+              value={text}
               onChangeText={onChangeText}
               multiline
             />
