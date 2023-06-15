@@ -1,5 +1,5 @@
-import { createContext } from 'react';
-import { User } from '../types';
+import {createContext} from 'react';
+import {User} from '../types';
 
 export interface AuthContextProp {
   initialized: boolean;
@@ -8,6 +8,7 @@ export interface AuthContextProp {
   processingSignup: boolean;
   signin: (email: string, password: string) => Promise<void>;
   processingSignin: boolean;
+  updateProfileImage: (filepath: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextProp>({
@@ -17,6 +18,7 @@ const AuthContext = createContext<AuthContextProp>({
   processingSignup: false,
   signin: async () => {},
   processingSignin: false,
+  updateProfileImage: async () => {},
 });
 
 export default AuthContext;

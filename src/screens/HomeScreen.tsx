@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect, useState } from 'react';
+import {useCallback, useContext, useEffect, useState} from 'react';
 import Screen from '../components/screen';
 import AuthContext from '../components/AuthContext';
 import {
@@ -12,8 +12,10 @@ import {
 import Colors from '../modules/Color';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
-import { Collections, RootStackNavigationProp, User } from '../types';
-import { useNavigation } from '@react-navigation/native';
+import {Collections, RootStackNavigationProp, User} from '../types';
+import {useNavigation} from '@react-navigation/native';
+import ImageCropPicker from 'react-native-image-crop-picker';
+import Profile from '../components/Profile';
 
 const styles = StyleSheet.create({
   container: {
@@ -46,7 +48,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
-  logoutText: { color: Colors.WHITE },
+  logoutText: {color: Colors.WHITE},
   userListSection: {
     flex: 1,
     marginTop: 40,
@@ -80,10 +82,13 @@ const styles = StyleSheet.create({
   emptyText: {
     color: Colors.BLACK,
   },
+  profile: {
+    marginRight: 10,
+  },
 });
 
 const HomeScreen = () => {
-  const { user: me } = useContext(AuthContext);
+  const {user: me, updateProfileImage} = useContext(AuthContext);
   const [loadingUsers, setLoadingUsers] = useState(false);
   const [users, setUsers] = useState<User[]>([]);
   const navigation = useNavigation<RootStackNavigationProp>();
@@ -108,6 +113,14 @@ const HomeScreen = () => {
     auth().signOut();
   }, []);
 
+  const onPressProfile = useCallback(async () => {
+    const image = await ImageCropPicker.openPicker({
+      cropping: true,
+      cropperCircleOverlay: true,
+    });
+    await updateProfileImage(image.path);
+  }, [updateProfileImage]);
+
   const renderLoading = useCallback(
     () => (
       <View style={styles.loadingContainer}>
@@ -127,6 +140,12 @@ const HomeScreen = () => {
         <View>
           <Text style={styles.sectionTitleText}>나의 정보</Text>
           <View style={styles.userSectionContent}>
+            <Profile
+              style={styles.profile}
+              onPress={onPressProfile}
+              imageUrl={me.profileUrl}
+            />
+            <TouchableOpacity style={styles.profile} onPress={onPressProfile} />
             <View style={styles.myProfile}>
               <Text style={styles.myNameText}>{me?.name}</Text>
               <Text style={styles.myEmailText}>{me?.email}</Text>
@@ -147,7 +166,7 @@ const HomeScreen = () => {
               <FlatList
                 style={styles.userList}
                 data={users}
-                renderItem={({ item: user }) => (
+                renderItem={({item: user}) => (
                   <TouchableOpacity
                     style={styles.userListItem}
                     onPress={() => {

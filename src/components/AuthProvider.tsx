@@ -1,10 +1,12 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import {useCallback, useEffect, useMemo, useState} from 'react';
 import auth from '@react-native-firebase/auth';
-import { Collections, User } from '../types';
+import {Collections, User} from '../types';
 import firestore from '@react-native-firebase/firestore';
 import AuthContext from './AuthContext';
+import _ from 'lodash';
+import storage from '@react-native-firebase/storage';
 
-const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+const AuthProvider = ({children}: {children: React.ReactNode}) => {
   const [initialized, setInitialized] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [processingSignup, setProcessingSignup] = useState(false);
@@ -17,6 +19,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           userId: fbUser.uid,
           email: fbUser.email ?? '',
           name: fbUser.displayName ?? '',
+          profileUrl: fbUser.photoURL ?? '',
         });
       } else {
         //logout
@@ -33,9 +36,11 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     async (email: string, password: string, name: string) => {
       setProcessingSignup(true);
       try {
-        const { user: currentUser } =
-          await auth().createUserWithEmailAndPassword(email, password);
-        await currentUser.updateProfile({ displayName: name });
+        const {user: currentUser} = await auth().createUserWithEmailAndPassword(
+          email,
+          password,
+        );
+        await currentUser.updateProfile({displayName: name});
         await firestore()
           .collection(Collections.USERS)
           .doc(currentUser.uid)
@@ -58,6 +63,29 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setProcessingSignin(false);
     }
   }, []);
+
+  const updateProfileImage = useCallback(
+    async (filepath: string) => {
+      //image upload
+
+      if (user == null) {
+        throw new Error('user is undefined');
+      }
+      const filename = _.last(filepath.split('/'));
+      if (filename == null) {
+        throw new Error('filename is undefined');
+      }
+      const storageFilepath = `user/${user?.userId}/${filename}`;
+      await storage().ref(storageFilepath).putFile(filepath);
+      const url = await storage().ref(storageFilepath).getDownloadURL();
+      await auth().currentUser?.updateProfile({photoURL: url});
+      await firestore().collection(Collections.USERS).doc(user.userId).update({
+        profileUrl: url,
+      });
+      //register image on user profile
+    },
+    [user],
+  );
   const value = useMemo(() => {
     return {
       initialized,
@@ -66,6 +94,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       processingSignup,
       signin,
       processingSignin,
+      updateProfileImage,
     };
   }, [initialized, user, signup, signin, processingSignup, processingSignin]);
 
