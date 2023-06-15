@@ -2,17 +2,23 @@ import {useCallback} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 import dayjs from 'dayjs';
 import Colors from '../modules/Color';
+import UserPhoto from './UserPhoto';
 
 interface MessageProps {
   name: string;
   text: string;
   createdAt: Date;
   isOtherMessage: boolean;
+  imageUrl?: string;
 }
 
 const styles = StyleSheet.create({
+  root: {
+    flexDirection: 'row',
+  },
   container: {
     alignItems: 'flex-end',
+    flex: 1,
   },
   nameText: {
     fontSize: 12,
@@ -38,6 +44,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: Colors.WHITE,
   },
+  userPhoto: {
+    marginRight: 4,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 });
 const otherMessageStyles = {
   container: [styles.container, {alignItems: 'flex-start' as const}],
@@ -50,7 +61,13 @@ const otherMessageStyles = {
   ],
 };
 
-const Message = ({name, text, createdAt, isOtherMessage}: MessageProps) => {
+const Message = ({
+  name,
+  text,
+  createdAt,
+  isOtherMessage,
+  imageUrl,
+}: MessageProps) => {
   const messageStyles = isOtherMessage ? otherMessageStyles : styles;
   const renderMessageContainer = useCallback(() => {
     const components = [
@@ -65,9 +82,19 @@ const Message = ({name, text, createdAt, isOtherMessage}: MessageProps) => {
     return isOtherMessage ? components.reverse() : components;
   }, [createdAt, text, messageStyles, isOtherMessage]);
   return (
-    <View style={messageStyles.container}>
-      <Text style={styles.nameText}>{name}</Text>
-      <View style={styles.messageContainer}>{renderMessageContainer()}</View>
+    <View style={styles.root}>
+      {isOtherMessage && (
+        <UserPhoto
+          style={styles.userPhoto}
+          imageUrl={imageUrl}
+          name={name}
+          size={34}
+        />
+      )}
+      <View style={messageStyles.container}>
+        <Text style={styles.nameText}>{name}</Text>
+        <View style={styles.messageContainer}>{renderMessageContainer()}</View>
+      </View>
     </View>
   );
 };

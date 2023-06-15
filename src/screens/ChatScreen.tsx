@@ -16,6 +16,7 @@ import Colors from '../modules/Color';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import AuthContext from '../components/AuthContext';
 import Message from '../components/Message';
+import UserPhoto from '../components/UserPhoto';
 
 const styles = StyleSheet.create({
   container: {
@@ -133,9 +134,13 @@ const ChatScreen = () => {
           <FlatList
             data={chat.users}
             renderItem={({item: user}) => (
-              <View style={styles.userProfile}>
-                <Text style={styles.userProfileText}>{user.name[0]}</Text>
-              </View>
+              <UserPhoto
+                size={34}
+                style={styles.userProfile}
+                name={user.name}
+                nameStyle={styles.userProfileText}
+                imageUrl={user.profileUrl}
+              />
             )}
             horizontal
           />
@@ -146,12 +151,14 @@ const ChatScreen = () => {
           style={styles.messageList}
           data={messages}
           renderItem={({item: message}) => {
+            const user = chat.users.find(u => u.userId === message.user.userId);
             return (
               <Message
-                name={message.user.name}
+                name={user?.name ?? ''}
                 text={message.text}
                 createdAt={message.createdAt}
                 isOtherMessage={message.user.userId !== me?.userId}
+                imageUrl={user?.profileUrl}
               />
             );
           }}
