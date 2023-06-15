@@ -146,6 +146,7 @@ const useChat = (userIds: string[]) => {
     };
   }, [addNewMessages, chat?.id]);
 
+  //마지막 채팅방에 들어온 기록
   const updateMessageReadAt = useCallback(
     async (userId: string) => {
       if (chat == null) {
@@ -335,8 +336,8 @@ const useChat = (userIds: string[]) => {
     messages,
     sending,
     loadingMessages,
-    // updateMessageReadAt,
-    // userToMessageReadAt,
+    updateMessageReadAt,
+    userToMessageReadAt,
     // sendImageMessage,
     // sendAudioMessage,
   };

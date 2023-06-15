@@ -11,12 +11,13 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import {useCallback, useContext, useMemo, useState} from 'react';
+import {useCallback, useContext, useEffect, useMemo, useState} from 'react';
 import Colors from '../modules/Color';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import AuthContext from '../components/AuthContext';
 import Message from '../components/Message';
 import UserPhoto from '../components/UserPhoto';
+import dayjs from 'dayjs';
 
 const styles = StyleSheet.create({
   container: {
@@ -102,11 +103,25 @@ const ChatScreen = () => {
   const {params} = useRoute<RouteProp<RootStackParamList, 'Chat'>>();
   const {other, userIds} = params;
   console.log(params);
-  const {loadingChat, chat, sendMessage, messages, loadingMessages} =
-    useChat(userIds);
+  const {
+    loadingChat,
+    chat,
+    sendMessage,
+    messages,
+    loadingMessages,
+    updateMessageReadAt,
+    userToMessageReadAt,
+  } = useChat(userIds);
   const [text, setText] = useState('');
   const {user: me} = useContext(AuthContext);
   const loading = loadingChat || loadingMessages;
+
+  //채팅방에 들어가기 전에 me가 비어있거나 메세지가 로딩 되지 않았는데 읽혔다고 표시를 없애는것을 방지하기위해 메세지가 로딩후 읽히게
+  useEffect(() => {
+    if (me != null && messages.length > 0) {
+      updateMessageReadAt(me?.userId);
+    }
+  }, [me, messages.length, updateMessageReadAt]);
 
   //입력이 안하면 버튼 비활성화
   const sendDisabled = useMemo(() => text.length === 0, [text]);
@@ -152,6 +167,14 @@ const ChatScreen = () => {
           data={messages}
           renderItem={({item: message}) => {
             const user = chat.users.find(u => u.userId === message.user.userId);
+            const unreadUsers = chat.users.filter(u => {
+              const messageReadAt = userToMessageReadAt[u.userId] ?? null;
+              if (messageReadAt == null) {
+                return true;
+              }
+              return dayjs(messageReadAt).isBefore(message.createdAt);
+            });
+            const unreadCount = unreadUsers.length;
             return (
               <Message
                 name={user?.name ?? ''}
@@ -159,6 +182,7 @@ const ChatScreen = () => {
                 createdAt={message.createdAt}
                 isOtherMessage={message.user.userId !== me?.userId}
                 imageUrl={user?.profileUrl}
+                unreadCount={unreadCount}
               />
             );
           }}
@@ -193,6 +217,7 @@ const ChatScreen = () => {
     onPressSendButton,
     messages,
     me?.userId,
+    userToMessageReadAt,
   ]);
   return (
     <Screen title={other.name}>
