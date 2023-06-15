@@ -94,7 +94,7 @@ const useChat = (userIds: string[]) => {
           {
             id: doc.id,
             text: text,
-            // imageUrl: null,
+            imageUrl: null,
             // audioUrl: null,
             user: user,
             createdAt: new Date(),
@@ -130,7 +130,7 @@ const useChat = (userIds: string[]) => {
             const newMessage: Message = {
               id: doc.id,
               text: docData.text ?? null,
-              // imageUrl: docData.imageUrl ?? null,
+              imageUrl: docData.imageUrl ?? null,
               // audioUrl: docData.audioUrl ?? null,
               user: docData.user,
               createdAt: docData.createdAt.toDate(),
@@ -230,7 +230,7 @@ const useChat = (userIds: string[]) => {
           {
             id: doc.id,
             text: null,
-            // imageUrl: url,
+            imageUrl: url,
             // audioUrl: null,
             user: user,
             createdAt: new Date(),
@@ -313,7 +313,7 @@ const useChat = (userIds: string[]) => {
             const newMessage: Message = {
               id: doc.id,
               text: docData.text ?? null,
-              // imageUrl: docData.imageUrl ?? null,
+              imageUrl: docData.imageUrl ?? null,
               // audioUrl: docData.audioUrl ?? null,
               user: docData.user,
               createdAt: docData.createdAt.toDate(),
@@ -338,7 +338,7 @@ const useChat = (userIds: string[]) => {
     loadingMessages,
     updateMessageReadAt,
     userToMessageReadAt,
-    // sendImageMessage,
+    sendImageMessage,
     // sendAudioMessage,
   };
 };
