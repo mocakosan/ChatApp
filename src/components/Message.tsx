@@ -4,6 +4,7 @@ import dayjs from 'dayjs';
 import Colors from '../modules/Color';
 import UserPhoto from './UserPhoto';
 import ImageMessage from './ImageMessage';
+import AudioMessage from './AudioMessage';
 
 interface TextMessage {
   text: string;
@@ -13,13 +14,17 @@ interface ImageMessage {
   imageUrl: string;
 }
 
+interface AudioMessage {
+  audioUrl: string;
+}
+
 interface MessageProps {
   name: string;
   createdAt: Date;
   isOtherMessage: boolean;
   userImageUrl?: string;
   unreadCount?: number;
-  message: TextMessage | ImageMessage;
+  message: TextMessage | ImageMessage | AudioMessage;
 }
 
 const styles = StyleSheet.create({
@@ -94,7 +99,12 @@ const Message = ({
     if ('imageUrl' in message) {
       return <ImageMessage url={message.imageUrl} />;
     }
-  }, [message, messageStyles.messageText]);
+    if ('audioUrl' in message) {
+      return (
+        <AudioMessage url={message.audioUrl} isOtherMessage={isOtherMessage} />
+      );
+    }
+  }, [message, messageStyles.messageText, isOtherMessage]);
   const renderMessageContainer = useCallback(() => {
     const components = [
       <View key="metaInfo" style={messageStyles.metaInfo}>

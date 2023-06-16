@@ -245,6 +245,14 @@ const ChatScreen = () => {
                 />
               );
             }
+            if (message.audioUrl != null) {
+              return (
+                <Message
+                  {...commonProps}
+                  message={{audioUrl: message.audioUrl}}
+                />
+              );
+            }
             return null;
           }}
           ItemSeparatorComponent={() => (
