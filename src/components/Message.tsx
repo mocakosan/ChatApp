@@ -1,16 +1,25 @@
-import {useCallback} from 'react';
+import React, {useCallback} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 import dayjs from 'dayjs';
 import Colors from '../modules/Color';
 import UserPhoto from './UserPhoto';
+import ImageMessage from './ImageMessage';
+
+interface TextMessage {
+  text: string;
+}
+
+interface ImageMessage {
+  imageUrl: string;
+}
 
 interface MessageProps {
   name: string;
-  text: string;
   createdAt: Date;
   isOtherMessage: boolean;
-  imageUrl?: string;
+  userImageUrl?: string;
   unreadCount?: number;
+  message: TextMessage | ImageMessage;
 }
 
 const styles = StyleSheet.create({
@@ -71,13 +80,21 @@ const otherMessageStyles = {
 
 const Message = ({
   name,
-  text,
   createdAt,
   isOtherMessage,
-  imageUrl,
+  userImageUrl,
   unreadCount = 0,
+  message,
 }: MessageProps) => {
   const messageStyles = isOtherMessage ? otherMessageStyles : styles;
+  const renderMessage = useCallback(() => {
+    if ('text' in message) {
+      return <Text style={messageStyles.messageText}>{message.text}</Text>;
+    }
+    if ('imageUrl' in message) {
+      return <ImageMessage url={message.imageUrl} />;
+    }
+  }, [message, messageStyles.messageText]);
   const renderMessageContainer = useCallback(() => {
     const components = [
       <View key="metaInfo" style={messageStyles.metaInfo}>
@@ -89,18 +106,18 @@ const Message = ({
         </Text>
       </View>,
       <View key="message" style={messageStyles.bubble}>
-        <Text style={messageStyles.messageText}>{text}</Text>
+        {renderMessage()}
       </View>,
     ];
     //다른사람 메세지는 타임스탬프하고 메세지가 반대로 배치되게
     return isOtherMessage ? components.reverse() : components;
-  }, [createdAt, text, messageStyles, isOtherMessage, unreadCount]);
+  }, [createdAt, messageStyles, isOtherMessage, unreadCount, renderMessage]);
   return (
     <View style={styles.root}>
       {isOtherMessage && (
         <UserPhoto
           style={styles.userPhoto}
-          imageUrl={imageUrl}
+          imageUrl={userImageUrl}
           name={name}
           size={34}
         />

@@ -203,20 +203,26 @@ const ChatScreen = () => {
               return dayjs(messageReadAt).isBefore(message.createdAt);
             });
             const unreadCount = unreadUsers.length;
+
+            const commonProps = {
+              name: user?.name ?? '',
+              createdAt: message.createdAt,
+              isOtherMessage: message.user.userId !== me?.userId,
+              userImageUrl: user?.profileUrl,
+              unreadCount: unreadCount,
+            };
             if (message.text != null) {
               return (
-                <Message
-                  name={user?.name ?? ''}
-                  text={message.text}
-                  createdAt={message.createdAt}
-                  isOtherMessage={message.user.userId !== me?.userId}
-                  imageUrl={user?.profileUrl}
-                  unreadCount={unreadCount}
-                />
+                <Message {...commonProps} message={{text: message.text}} />
               );
             }
             if (message.imageUrl != null) {
-              return null;
+              return (
+                <Message
+                  {...commonProps}
+                  message={{imageUrl: message.imageUrl}}
+                />
+              );
             }
             return null;
           }}
