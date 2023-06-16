@@ -4,6 +4,7 @@ import {RootStackParamList} from '../types';
 import useChat from '../hooks/useChat';
 import {
   ActivityIndicator,
+  Alert,
   FlatList,
   StyleSheet,
   Text,
@@ -19,6 +20,7 @@ import Message from '../components/Message';
 import UserPhoto from '../components/UserPhoto';
 import dayjs from 'dayjs';
 import ImageCropPicker from 'react-native-image-crop-picker';
+import MicButton from '../components/MicButton';
 
 const styles = StyleSheet.create({
   container: {
@@ -132,6 +134,7 @@ const ChatScreen = () => {
     updateMessageReadAt,
     userToMessageReadAt,
     sendImageMessage,
+    sendAudioMessage,
     sending,
   } = useChat(userIds);
   const [text, setText] = useState('');
@@ -165,6 +168,24 @@ const ChatScreen = () => {
       sendImageMessage(image.path, me);
     }
   }, [me, sendImageMessage]);
+
+  const onRecorded = useCallback(
+    (path: string) => {
+      Alert.alert('녹음 완료', '음성 메시지를 보낼까요?', [
+        {text: '아니요'},
+        {
+          text: '네',
+          onPress: () => {
+            console.log('path', path);
+            if (me != null) {
+              sendAudioMessage(path, me);
+            }
+          },
+        },
+      ]);
+    },
+    [me, sendAudioMessage],
+  );
 
   const renderChat = useCallback(() => {
     if (chat == null) {
@@ -261,6 +282,9 @@ const ChatScreen = () => {
             onPress={onPressImageButton}>
             <Icon name="image" style={styles.imageIcon} />
           </TouchableOpacity>
+          <View>
+            <MicButton onRecorded={onRecorded} />
+          </View>
         </View>
       </View>
     );
@@ -274,6 +298,7 @@ const ChatScreen = () => {
     me?.userId,
     userToMessageReadAt,
     onPressImageButton,
+    onRecorded,
     sending,
   ]);
   return (

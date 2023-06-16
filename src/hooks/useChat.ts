@@ -95,7 +95,7 @@ const useChat = (userIds: string[]) => {
             id: doc.id,
             text: text,
             imageUrl: null,
-            // audioUrl: null,
+            audioUrl: null,
             user: user,
             createdAt: new Date(),
           },
@@ -131,7 +131,7 @@ const useChat = (userIds: string[]) => {
               id: doc.id,
               text: docData.text ?? null,
               imageUrl: docData.imageUrl ?? null,
-              // audioUrl: docData.audioUrl ?? null,
+              audioUrl: docData.audioUrl ?? null,
               user: docData.user,
               createdAt: docData.createdAt.toDate(),
             };
@@ -231,7 +231,7 @@ const useChat = (userIds: string[]) => {
             id: doc.id,
             text: null,
             imageUrl: url,
-            // audioUrl: null,
+            audioUrl: null,
             user: user,
             createdAt: new Date(),
           },
@@ -277,8 +277,8 @@ const useChat = (userIds: string[]) => {
           {
             id: doc.id,
             text: null,
-            // imageUrl: null,
-            // audioUrl: url,
+            imageUrl: null,
+            audioUrl: url,
             user: user,
             createdAt: new Date(),
           },
@@ -314,7 +314,7 @@ const useChat = (userIds: string[]) => {
               id: doc.id,
               text: docData.text ?? null,
               imageUrl: docData.imageUrl ?? null,
-              // audioUrl: docData.audioUrl ?? null,
+              audioUrl: docData.audioUrl ?? null,
               user: docData.user,
               createdAt: docData.createdAt.toDate(),
             };
@@ -339,7 +339,7 @@ const useChat = (userIds: string[]) => {
     updateMessageReadAt,
     userToMessageReadAt,
     sendImageMessage,
-    // sendAudioMessage,
+    sendAudioMessage,
   };
 };
 
