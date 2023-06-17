@@ -9,12 +9,14 @@ import AuthContext from './src/components/AuthContext';
 import HomeScreen from './src/screens/HomeScreen';
 import LoadingScreen from './src/screens/LoadingScreen';
 import ChatScreen from './src/screens/ChatScreen';
+import usePushNotification from './src/hooks/userPushNotification';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 const Screnns = () => {
   const {user, processingSignin, processingSignup, initialized} =
     useContext(AuthContext);
+  usePushNotification();
   const renderRootStack = useCallback(() => {
     if (!initialized) {
       return <Stack.Screen name="Loading" component={LoadingScreen} />;
