@@ -123,7 +123,7 @@ const disabledSendButtonStyle = [
 
 const ChatScreen = () => {
   const {params} = useRoute<RouteProp<RootStackParamList, 'Chat'>>();
-  const {other, userIds} = params;
+  const {userIds} = params;
   console.log(params);
   const {
     loadingChat,
@@ -140,6 +140,13 @@ const ChatScreen = () => {
   const [text, setText] = useState('');
   const {user: me} = useContext(AuthContext);
   const loading = loadingChat || loadingMessages;
+
+  const other = useMemo(() => {
+    if (chat != null && me != null) {
+      return chat.users.filter(u => u.userId !== me.userId)[0];
+    }
+    return null;
+  }, [chat, me]);
 
   //채팅방에 들어가기 전에 me가 비어있거나 메세지가 로딩 되지 않았는데 읽혔다고 표시를 없애는것을 방지하기위해 메세지가 로딩후 읽히게
   useEffect(() => {
@@ -310,7 +317,7 @@ const ChatScreen = () => {
     sending,
   ]);
   return (
-    <Screen title={other.name}>
+    <Screen title={other?.name}>
       <View style={styles.container}>
         {loading ? (
           <View style={styles.loadingContainer}>

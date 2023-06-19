@@ -7,7 +7,6 @@ export type RootStackParamList = {
   Loading: undefined;
   Chat: {
     userIds: string[];
-    other: User;
   };
 };
 export type RootStackNavigationProp =
